@@ -64,35 +64,12 @@ class DHF1K_frames(data.Dataset):
 
 
 
-<<<<<<< HEAD
-=======
-  def __init__(self, frames_path, gt_path, video_list, ground_truths_list, split, val_perc = 0.15):
-        self.frames_path = frames_path
-        self.gt_path = gt_path
-
-        # Split the dataset to validation and training
-        limit = int(round(val_perc*len(video_list)))
-        if split == "validation":
-          self.video_list = video_list[:limit]
-          self.gts_list = ground_truths_list[:limit]
-          self.first_video_no = 1 #This needs to be specified to find the correct directory in our case. It will be different for each split since these directories signify videos.
-        elif split == "train":
-          self.video_list = video_list[limit:]
-          self.gts_list = ground_truths_list[limit:]
-          self.first_video_no = limit+1
-
->>>>>>> 1247a1d3d452e438660fb8d9bf9b4424acd17c40
 
   def __len__(self):
         'Denotes the total number of samples'
         return len(self.video_list)
 
-<<<<<<< HEAD
   def __getitem__(self, video_index):
-=======
-  def __getitem__(self, index):
-
->>>>>>> 1247a1d3d452e438660fb8d9bf9b4424acd17c40
 
         'Generates one sample of data'
         # Select sample video (frame list), in our case saliency map list
@@ -102,12 +79,8 @@ class DHF1K_frames(data.Dataset):
         # Due to the split in train and validation we need to add this number to the video_index to find the correct video (to match the files in the path with the video list the training part uses)
         true_index = self.first_video_no + video_index #this matches the correct video number
 
-        # Due to the split in train and validation we need to add this number to the index to find the correct video (to match the files in the path with the video list the training part uses)
-        true_index = self.first_video_no + index #this matches the correct video number
-
         data = []
         gt = []
-<<<<<<< HEAD
         packed = []
         for i, frame in enumerate(frames):
 
@@ -129,28 +102,9 @@ class DHF1K_frames(data.Dataset):
           #if self.transforms is not None:
           #    y = self.transforms(y)
           #y = torch.from_numpy(y).unsqueeze(0)
-=======
-        for i, frame in enumerate(frames):
-          path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
-          # Load data and get ground truth
-          try:
-            X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
-            X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
-            X = torch.from_numpy(X).unsqueeze(0) # Use unsqueeze because grayscale has 1 channel and it would be omitted but pytorch expects to see it. (something weird happens here probably, get back to it)
 
-            path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
-            y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
-            y = cv2.normalize(y, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
-            y = torch.from_numpy(y).unsqueeze(0)
-
-            data.append(X)
-            gt.append(y)
-          except RuntimeError:
-            print("Unexpected error at frame {} video {}".format(i, index))
-            print("Index that parses video list: {}\n Index that specifies video in path: {}\nPath {}\n Length frames {}".format(index, true_index, path_to_frame, len(frames)))
-            print("Index that parses the list needs to be 1 less than index that specifies video in the path. Check that this is correct and that length of frames matches the true length.")
->>>>>>> 1247a1d3d452e438660fb8d9bf9b4424acd17c40
-
+          data.append(X)
+          gt.append(y)
 
           """
           except RuntimeError:

@@ -28,7 +28,7 @@ epochs = 5
 plot_every = 5
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
-frame_batch_size = 5 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
+frame_batch_size = 1 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
 
 
 #writer = SummaryWriter('./log') #Tensorboard

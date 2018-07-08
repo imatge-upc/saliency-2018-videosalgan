@@ -41,12 +41,8 @@ class ConvLSTMCell(nn.Module):
         prev_hidden, prev_cell = prev_state
 
         # data size is [batch, channel, height, width]
-<<<<<<< HEAD
 
-        print(prev_hidden.size())
-=======
         #print(prev_hidden.size())
->>>>>>> 1247a1d3d452e438660fb8d9bf9b4424acd17c40
         stacked_inputs = torch.cat((input_, prev_hidden), 1)
         #print("stacked input size {}".format(stacked_inputs.size()))
         gates = self.Gates(stacked_inputs)
