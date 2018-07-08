@@ -9,7 +9,7 @@ from PIL import Image
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
 
-  def __init__(self, split, batch_size, number_of_videos=11, val_perc = 0.15, transforms = None):
+  def __init__(self, split, batch_size, number_of_videos, val_perc = 0.15, transforms = None):
 
         self.transforms = transforms
         self.bs = batch_size

@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Big Files
+./gen_modelWeights0090.npz
+
