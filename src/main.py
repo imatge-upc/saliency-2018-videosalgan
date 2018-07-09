@@ -24,8 +24,8 @@ learning_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 10
-plot_every = 5
+epochs = 30
+plot_every = 3
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
 clip_length = 5 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
@@ -35,7 +35,7 @@ number_of_videos = 5
 #writer = SummaryWriter('./log') #Tensorboard
 
 # Parameters
-params = {'batch_size': 1, #this is actually the number of videos
+params = {'batch_size': 1, # number of videos / batch
           'num_workers': 4,
           'pin_memory': True}
 
@@ -93,7 +93,8 @@ def main(params = params):
 
     train_losses = []
     val_losses = []
-    print("Training started at : {}".format(datetime.datetime.now().replace(microsecond=0)))
+    starting_time = datetime.datetime.now().replace(microsecond=0)
+    print("Training started at : {}".format(starting_time))
     for epoch in range(start_epoch, epochs):
         # train for one epoch
         train_loss = train(train_loader, model, criterion, optimizer, epoch)
@@ -103,12 +104,12 @@ def main(params = params):
 
 
         if epoch % plot_every == 0:
-            train_losses.append(train_loss)
-            val_losses.append(val_loss)
+            train_losses.append(train_loss.cpu())
+            val_losses.append(val_loss.cpu())
 
         print("Epoch {}/{} done with train loss {} and validation loss {}\n".format(epoch, epochs, train_loss, val_loss))
 
-    print("Training finished at : {} \n Now saving..".format(datetime.datetime.now().replace(microsecond=0)))
+    print("Training started at {} and finished at : {} \n Now saving..".format(starting_time, datetime.datetime.now().replace(microsecond=0)))
 
     # ===================== #
     # ======  Saving ====== #
@@ -165,7 +166,6 @@ def train(train_loader, model, criterion, optimizer, epoch):
             #print(frame.size()) #works! torch.Size([5, 1, 360, 640])
             #print(gt.size()) #works! torch.Size([5, 1, 360, 640])
 
-            # Keep the hidden state after each batch of frames and initialize next batch with it
             for idx in range(clip.size()[0]):
                 #print(clip[idx].size()) needs unsqueeze
                 # Compute output
@@ -174,6 +174,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
                 loss = criterion(saliency_map, gtruths[idx].unsqueeze(0))
                 # Keep score
                 frame_losses.append(loss.data)
+
                 # Accumulate gradients
                 if idx == (clip.size()[0]-1):
                     loss.backward()
@@ -198,7 +199,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
             #cell = Variable(cell.data, requires_grad=True)
 
             if (j+1)%20==0:
-                print('Training Loss is {} at batch {} in video {}'.format(loss.data, j+1, i))
+                print('Training Loss: {} Video/Clip: {}/{} '.format(loss.data, i, j+1))
 
         #writer.add_scalar('Train/Loss', mean(frame_losses), i)
         end = datetime.datetime.now().replace(microsecond=0)
@@ -214,6 +215,7 @@ def validate(val_loader, model, criterion, epoch):
     model.eval()
 
     video_losses = []
+    print("Now running validation..")
     for i, video in enumerate(val_loader):
         frame_losses = []
         state = None # Initially no hidden state
@@ -222,7 +224,6 @@ def validate(val_loader, model, criterion, epoch):
             # squeeze out the video dimension
             clip = Variable(clip.type(dtype), requires_grad=False).squeeze(0)
             gtruths = Variable(gtruths.type(dtype), requires_grad=False).squeeze(0)
-
 
             for idx in range(clip.size()[0]):
                 #print(clip[idx].size()) needs unsqueeze
@@ -238,8 +239,6 @@ def validate(val_loader, model, criterion, epoch):
                 # Keep score
                 frame_losses.append(loss.data)
 
-        print('Epoch: {}\tVideo {}\t Validation Loss {}\t'.format(
-            epoch, i+1, mean(frame_losses)))
         video_losses.append(mean(frame_losses))
         #writer.add_scalar('Val/Loss', mean(frame_losses), i)
 

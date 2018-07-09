@@ -7,7 +7,8 @@ with open('to_plot.pkl', 'rb') as handle:
 
     to_plot = pickle.load(handle)
 
-
+print(to_plot)
+"""
 plt.subplot(111)
 plt.plot(to_plot['epoch_ticks'], to_plot['train_losses'], label = "Training Loss")
 plt.plot(to_plot['epoch_ticks'], to_plot['val_losses'], label = "Validation Loss")
@@ -20,3 +21,4 @@ plt.tight_layout()
 
 plt.savefig('Loss_Plot.png')
 
+"""
