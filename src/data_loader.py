@@ -9,10 +9,10 @@ from PIL import Image
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
 
-  def __init__(self, split, batch_size, number_of_videos, val_perc = 0.15, transforms = None):
+  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, transforms = None):
 
         self.transforms = transforms
-        self.bs = batch_size
+        self.cl = clip_length
         self.frames_path = "/imatge/lpanagiotis/work/DHF1K/predictions" # in our case it's salgan saliency maps
         self.gt_path = "/imatge/lpanagiotis/work/DHF1K/maps" #ground truth
 
@@ -114,7 +114,7 @@ class DHF1K_frames(data.Dataset):
             print("Index that parses the list needs to be 1 less than index that specifies video in the path. Check that this is correct and that length of frames matches the true length.")
           """
 
-          if (i+1)%self.bs == 0 or i == (len(frames)-1):
+          if (i+1)%self.cl == 0 or i == (len(frames)-1):
             #print(np.array(data).shape) #looks okay
             data_tensor = torch.ByteTensor(data) # unsigned integers
             gt_tensor = torch.ByteTensor(gt) # unsigned integers

@@ -24,11 +24,11 @@ learning_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 5
+epochs = 10
 plot_every = 5
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
-frame_batch_size = 1 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
+clip_length = 5 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
 number_of_videos = 5
 
 
@@ -47,12 +47,12 @@ def main(params = params):
     #Expect Error if either validation size or train size is 1
     train_set = DHF1K_frames(
         number_of_videos = number_of_videos,
-        batch_size = frame_batch_size,
+        clip_length = clip_length,
         split = "train") #add a parameter node = training or validation
     print("Size of train set is {}".format(len(train_set)))
     val_set = DHF1K_frames(
         number_of_videos = number_of_videos,
-        batch_size = frame_batch_size,
+        clip_length = clip_length,
         split = "validation")
     print("Size of validation set is {}".format(len(val_set)))
 
@@ -137,6 +137,7 @@ def main(params = params):
     with open('to_plot.pkl', 'wb') as handle:
         pickle.dump(to_plot, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
 mean = lambda x : sum(x)/len(x)
 
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -150,46 +151,52 @@ def train(train_loader, model, criterion, optimizer, epoch):
         #print(type(video))
         frame_losses = []
         start = datetime.datetime.now().replace(microsecond=0)
-        print("Number of frame batches for video {} : {}".format(i,len(video)))
+        print("Number of clips for video {} : {}".format(i,len(video)))
         state = None # Initially no hidden state
-        # hangs at number of frame batches
-        for j, (frame_batch, gt_batch) in enumerate(video):
-            # feed batch of frames instead. Try whole sequence first then when it explodes try less.
-            #print(frames.size()) # 1xbatch_sizex1x360x640
+        for j, (clip, gtruths) in enumerate(video):
 
-            #print(gts.size()) # works!
+            # Reset Gradients
+            optimizer.zero_grad()
 
-            # squeeze out the video dimension
-            frame_batch = Variable(frame_batch.type(dtype)).squeeze(0)
-            gt_batch = Variable(gt_batch.type(dtype)).squeeze(0)
+            # Squeeze out the video dimension
+            clip = Variable(clip.type(dtype)).squeeze(0)
+            gtruths = Variable(gtruths.type(dtype)).squeeze(0)
 
             #print(frame.size()) #works! torch.Size([5, 1, 360, 640])
             #print(gt.size()) #works! torch.Size([5, 1, 360, 640])
 
             # Keep the hidden state after each batch of frames and initialize next batch with it
-
-            # Compute Output
-            #print(frame.size())
-            #print(state)
-            (hidden, cell), saliency_map = model.forward(frame_batch, state) #feed a previous state as well.
+            for idx in range(clip.size()[0]):
+                #print(clip[idx].size()) needs unsqueeze
+                # Compute output
+                state, saliency_map = model.forward(clip[idx].unsqueeze(0), state)
+                # Compute loss
+                loss = criterion(saliency_map, gtruths[idx].unsqueeze(0))
+                # Keep score
+                frame_losses.append(loss.data)
+                # Accumulate gradients
+                if idx == (clip.size()[0]-1):
+                    loss.backward()
+                else:
+                    loss.backward(retain_graph=True)
 
             # Repackage to avoid backpropagating further through time
+            (hidden, cell) = state
             hidden = Variable(hidden.data)
             cell = Variable(cell.data)
+            state = (hidden, cell)
 
-            loss = criterion(saliency_map, gt_batch) #negative values = weird
+            #hidden = Variable(hidden.data)
+            #cell = Variable(cell.data)
+
 
             # Compute gradient and do optimizing step
-            optimizer.zero_grad()
-            loss.backward()
             optimizer.step()
 
-            state = (hidden, cell)
+            #state = (hidden, cell)
             #hidden = Variable(hidden.data, requires_grad=True)
             #cell = Variable(cell.data, requires_grad=True)
 
-            # Keep score
-            frame_losses.append(loss.data)
             if (j+1)%20==0:
                 print('Training Loss is {} at batch {} in video {}'.format(loss.data, j+1, i))
 
@@ -210,33 +217,26 @@ def validate(val_loader, model, criterion, epoch):
     for i, video in enumerate(val_loader):
         frame_losses = []
         state = None # Initially no hidden state
-        for j, (frame_batch, gt_batch) in enumerate(video):
-            # feed batch of frames instead. Try whole sequence first then when it explodes try less.
-            #print(frames.size()) # 1xbatch_sizex1x360x640
-
-            #print(gts.size()) # works!
+        for j, (clip, gtruths) in enumerate(video):
 
             # squeeze out the video dimension
-            frame_batch = Variable(frame_batch.type(dtype)).squeeze(0)
-            gt_batch = Variable(gt_batch.type(dtype)).squeeze(0)
+            clip = Variable(clip.type(dtype), requires_grad=False).squeeze(0)
+            gtruths = Variable(gtruths.type(dtype), requires_grad=False).squeeze(0)
 
-            #print(frame.size()) #works! torch.Size([5, 1, 360, 640])
-            #print(gt.size()) #works! torch.Size([5, 1, 360, 640])
 
-            # Keep the hidden state after each batch of frames and initialize next batch with it
+            for idx in range(clip.size()[0]):
+                #print(clip[idx].size()) needs unsqueeze
+                # Compute output
+                (hidden, cell), saliency_map = model.forward(clip[idx].unsqueeze(0), state)
 
-            # Compute Output
-            (hidden, cell), saliency_map = model.forward(frame_batch, state) #feed a previous state as well.
+                hidden = Variable(hidden.data)
+                cell = Variable(cell.data)
+                state = (hidden, cell)
 
-            # Repackage to avoid backpropagating further through time
-            hidden = Variable(hidden.data)
-            cell = Variable(cell.data)
-
-            loss = criterion(saliency_map, gt_batch) #negative values = weird
-
-            state = (hidden, cell)
-            # Keep score
-            frame_losses.append(loss.data)
+                # Compute loss
+                loss = criterion(saliency_map, gtruths[idx].unsqueeze(0))
+                # Keep score
+                frame_losses.append(loss.data)
 
         print('Epoch: {}\tVideo {}\t Validation Loss {}\t'.format(
             epoch, i+1, mean(frame_losses)))

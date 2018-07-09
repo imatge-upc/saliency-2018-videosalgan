@@ -24,7 +24,6 @@ class ConvLSTMCell(nn.Module):
 
         # generate empty prev_state, if None is provided
         if prev_state is None:
-            # Given a batch of frames, it seems like it will handle all of them as one state?
             state_size = [batch_size, self.hidden_size] + list(spatial_size)
             if self.use_gpu:
                 prev_state = (
