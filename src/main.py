@@ -24,12 +24,12 @@ learning_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 3
+epochs = 10
 plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
 clip_length = 20 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
-number_of_videos = 4
+number_of_videos = 5
 
 
 #writer = SummaryWriter('./log') #Tensorboard
