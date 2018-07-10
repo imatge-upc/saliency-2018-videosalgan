@@ -29,7 +29,7 @@ class DHF1K_frames(data.Dataset):
             # The way the folder structure is organized allows to simply iterate over the range of the number of total videos.
             gt_files = os.listdir(os.path.join(self.gt_path,str(i)))
             frame_files = os.listdir(os.path.join(self.frames_path,str(i)))
-            print("for video {} the frames are {}".format(i, len(frame_files))) # This is correct
+            #print("for video {} the frames are {}".format(i, len(frame_files))) # This is correct
 
             # a list of lists
             self.video_list.append(frame_files)

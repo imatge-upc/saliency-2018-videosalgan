@@ -20,7 +20,8 @@ if torch.cuda.is_available():
     dtype = torch.cuda.FloatTensor
 
 
-learning_rate = 0.1
+learning_rate = 0.1 # initial
+decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
@@ -29,7 +30,7 @@ plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
 clip_length = 20 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
-number_of_videos = 5
+number_of_videos = 4 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
 #writer = SummaryWriter('./log') #Tensorboard
@@ -73,8 +74,15 @@ def main(params = params):
     criterion = nn.BCEWithLogitsLoss()
 
     if load_model:
-        # Need to check out how to work with dataparallel
-        checkpoint = torch.load(pretrained_model)['state_dict']
+        # Load stored model:
+        temp = torch.load(pretrained_model)['state_dict']
+        # Because of dataparallel there is contradiction in the name of the keys so we need to remove part of the string in the keys:.
+        from collections import OrderedDict
+        checkpoint = OrderedDict()
+        for key in temp.keys():
+            new_key = key.replace("module.","")
+            checkpoint[new_key]=temp[key]
+
         model.load_state_dict(checkpoint, strict=True)
         print("Pre-trained model loaded succesfully")
 
@@ -96,6 +104,8 @@ def main(params = params):
     starting_time = datetime.datetime.now().replace(microsecond=0)
     print("Training started at : {}".format(starting_time))
     for epoch in range(start_epoch, epochs):
+        adjust_learning_rate(optimizer, epoch, decay_rate)
+
         # train for one epoch
         train_loss = train(train_loader, model, criterion, optimizer, epoch)
 
@@ -140,6 +150,12 @@ def main(params = params):
 
 
 mean = lambda x : sum(x)/len(x)
+
+def adjust_learning_rate(optimizer, epoch, decay_rate=0.1):
+    """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+    lr = learning_rate * (decay_rate ** (epoch // 30))
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
 
 def train(train_loader, model, criterion, optimizer, epoch):
 
