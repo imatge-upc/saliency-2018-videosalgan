@@ -29,8 +29,8 @@ epochs = 10
 plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
-clip_length = 20 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
-number_of_videos = 4 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
+clip_length = 20 #with 20 clips the loss seems to reach zero very fast
+number_of_videos = 700 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
 #writer = SummaryWriter('./log') #Tensorboard
@@ -216,8 +216,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
             #hidden = Variable(hidden.data, requires_grad=True)
             #cell = Variable(cell.data, requires_grad=True)
 
+            """
             if (j+1)%20==0:
                 print('Training Loss: {} Batch/Clip: {}/{} '.format(loss.data, i, j+1))
+            """
 
         #writer.add_scalar('Train/Loss', mean(frame_losses), i)
         end = datetime.datetime.now().replace(microsecond=0)
