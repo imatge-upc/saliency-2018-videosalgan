@@ -9,9 +9,9 @@ from PIL import Image
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
 
-  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, transforms = None):
+  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, frame_size = (256, 192)):
 
-        self.transforms = transforms
+        self.frame_size = frame_size
         self.cl = clip_length
         self.frames_path = "/imatge/lpanagiotis/work/DHF1K/predictions" # in our case it's salgan saliency maps
         self.gt_path = "/imatge/lpanagiotis/work/DHF1K/maps" #ground truth
@@ -24,7 +24,7 @@ class DHF1K_frames(data.Dataset):
         self.gts_list = []
 
         start = datetime.datetime.now().replace(microsecond=0) # Gives accurate human readable time, rounded down not to include too many decimals
-        for i in range(1, number_of_videos): #700 videos in DHF1K
+        for i in range(1, number_of_videos+1): #700 videos in DHF1K
 
             # The way the folder structure is organized allows to simply iterate over the range of the number of total videos.
             gt_files = os.listdir(os.path.join(self.gt_path,str(i)))
@@ -88,6 +88,7 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
           X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
+          X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #X = Image.fromarray(X)
           #if self.transforms is not None:
@@ -97,6 +98,7 @@ class DHF1K_frames(data.Dataset):
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
           y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
           y = cv2.normalize(y, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
+          y = cv2.resize(y, self.frame_size, interpolation=cv2.INTER_AREA)
           y = np.expand_dims(y, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #y = Image.fromarray(y)
           #if self.transforms is not None:

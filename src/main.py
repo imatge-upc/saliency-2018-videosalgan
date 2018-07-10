@@ -24,18 +24,18 @@ learning_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 30
-plot_every = 3
+epochs = 3
+plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
-clip_length = 5 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
-number_of_videos = 5
+clip_length = 20 #out of memory at 10! with 2 gpus. Works with 7 but occasionally produces error as well.
+number_of_videos = 4
 
 
 #writer = SummaryWriter('./log') #Tensorboard
 
 # Parameters
-params = {'batch_size': 1, # number of videos / batch
+params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
           'num_workers': 4,
           'pin_memory': True}
 
@@ -160,18 +160,20 @@ def train(train_loader, model, criterion, optimizer, epoch):
             optimizer.zero_grad()
 
             # Squeeze out the video dimension
-            clip = Variable(clip.type(dtype)).squeeze(0)
-            gtruths = Variable(gtruths.type(dtype)).squeeze(0)
+            # [video_batch, clip_length, channels, height, width]
+            # After transpose:
+            # [clip_length, video_batch, channels, height, width]
+            clip = Variable(clip.type(dtype).t())
+            gtruths = Variable(gtruths.type(dtype).t())
 
-            #print(frame.size()) #works! torch.Size([5, 1, 360, 640])
-            #print(gt.size()) #works! torch.Size([5, 1, 360, 640])
+            #print(clip.size()) #works! torch.Size([5, 1, 1, 360, 640])
 
             for idx in range(clip.size()[0]):
-                #print(clip[idx].size()) needs unsqueeze
+                #print(clip[idx].size())
                 # Compute output
-                state, saliency_map = model.forward(clip[idx].unsqueeze(0), state)
+                state, saliency_map = model.forward(clip[idx], state)
                 # Compute loss
-                loss = criterion(saliency_map, gtruths[idx].unsqueeze(0))
+                loss = criterion(saliency_map, gtruths[idx])
                 # Keep score
                 frame_losses.append(loss.data)
 
@@ -199,7 +201,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
             #cell = Variable(cell.data, requires_grad=True)
 
             if (j+1)%20==0:
-                print('Training Loss: {} Video/Clip: {}/{} '.format(loss.data, i, j+1))
+                print('Training Loss: {} Batch/Clip: {}/{} '.format(loss.data, i, j+1))
 
         #writer.add_scalar('Train/Loss', mean(frame_losses), i)
         end = datetime.datetime.now().replace(microsecond=0)
@@ -221,21 +223,20 @@ def validate(val_loader, model, criterion, epoch):
         state = None # Initially no hidden state
         for j, (clip, gtruths) in enumerate(video):
 
-            # squeeze out the video dimension
-            clip = Variable(clip.type(dtype), requires_grad=False).squeeze(0)
-            gtruths = Variable(gtruths.type(dtype), requires_grad=False).squeeze(0)
+            clip = Variable(clip.type(dtype).t(), requires_grad=False)
+            gtruths = Variable(gtruths.type(dtype).t(), requires_grad=False)
 
             for idx in range(clip.size()[0]):
                 #print(clip[idx].size()) needs unsqueeze
                 # Compute output
-                (hidden, cell), saliency_map = model.forward(clip[idx].unsqueeze(0), state)
+                (hidden, cell), saliency_map = model.forward(clip[idx], state)
 
                 hidden = Variable(hidden.data)
                 cell = Variable(cell.data)
                 state = (hidden, cell)
 
                 # Compute loss
-                loss = criterion(saliency_map, gtruths[idx].unsqueeze(0))
+                loss = criterion(saliency_map, gtruths[idx])
                 # Keep score
                 frame_losses.append(loss.data)
 
