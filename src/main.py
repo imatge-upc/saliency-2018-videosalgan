@@ -11,7 +11,7 @@ from torch import nn
 from torch.utils import data
 from torch.autograd import Variable
 from torch.utils.data.sampler import SubsetRandomSampler
-#from tensorboardX import SummaryWriter
+from tensorboardX import SummaryWriter
 
 from data_loader import DHF1K_frames
 
@@ -19,21 +19,33 @@ dtype = torch.FloatTensor
 if torch.cuda.is_available():
     dtype = torch.cuda.FloatTensor
 
+"""
+Based on the superior BCE-based loss compared with MSE,
+we also explored the impact of computing the content loss over
+downsampled versions of the saliency map. This technique re-
+duces the required computational resources at both training and
+test times and, as shown in Table 3, not only does it not decrease
+performance, but it can actually improve it. Given this results,
+we chose to train SalGAN on saliency maps downsampled by
+a factor 1/4, which in our architecture corresponds to saliency
+maps of 64 × 48. - Salgan paper
+"""
 
-learning_rate = 0.1 # initial
+frame_size = (64, 36) #10 times lower than the original
+learning_rate = 0.0001 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out
 decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 10
+epochs = 5
 plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
 clip_length = 20 #with 20 clips the loss seems to reach zero very fast
-number_of_videos = 700 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
+number_of_videos = 10 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
-#writer = SummaryWriter('./log') #Tensorboard
+writer = SummaryWriter('./log') #Tensorboard
 
 # Parameters
 params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
@@ -47,11 +59,13 @@ def main(params = params):
 
     #Expect Error if either validation size or train size is 1
     train_set = DHF1K_frames(
+        frame_size = frame_size,
         number_of_videos = number_of_videos,
         clip_length = clip_length,
         split = "train") #add a parameter node = training or validation
     print("Size of train set is {}".format(len(train_set)))
     val_set = DHF1K_frames(
+        frame_size = frame_size,
         number_of_videos = number_of_videos,
         clip_length = clip_length,
         split = "validation")
@@ -221,7 +235,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
                 print('Training Loss: {} Batch/Clip: {}/{} '.format(loss.data, i, j+1))
             """
 
-        #writer.add_scalar('Train/Loss', mean(frame_losses), i)
+        writer.add_scalar('Train/Loss', mean(frame_losses), i)
         end = datetime.datetime.now().replace(microsecond=0)
         print('Epoch: {}\tVideo: {}\t Training Loss: {}\t Time elapsed: {}\t'.format(epoch, i, mean(frame_losses), end-start))
         video_losses.append(mean(frame_losses))
@@ -259,7 +273,7 @@ def validate(val_loader, model, criterion, epoch):
                 frame_losses.append(loss.data)
 
         video_losses.append(mean(frame_losses))
-        #writer.add_scalar('Val/Loss', mean(frame_losses), i)
+        writer.add_scalar('Val/Loss', mean(frame_losses), i)
 
     return(mean(video_losses))
 

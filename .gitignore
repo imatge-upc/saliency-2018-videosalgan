@@ -105,5 +105,5 @@ venv.bak/
 
 # Big Files
 gen_modelWeights0090.npz
-
+src/log
 
