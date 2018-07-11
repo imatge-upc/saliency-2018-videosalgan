@@ -10,7 +10,6 @@ import torch.backends.cudnn as cudnn
 from torch import nn
 from torch.utils import data
 from torch.autograd import Variable
-from torch.utils.data.sampler import SubsetRandomSampler
 from tensorboardX import SummaryWriter
 
 from data_loader import DHF1K_frames
@@ -32,7 +31,7 @@ maps of 64 × 48. - Salgan paper
 """
 
 frame_size = (64, 36) #10 times lower than the original
-learning_rate = 0.0001 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out
+learning_rate = 0.00001 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out, at 10^-5 it goes down more smoothly, but it's not oscillating. It goes the same direction just much slower.
 decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
@@ -86,6 +85,7 @@ def main(params = params):
     # input size is 1 since we have grayscale images
     model = ConvLSTMCell(use_gpu=True, input_size=1, hidden_size=128, kernel_size=3)
     criterion = nn.BCEWithLogitsLoss()
+    #criterion = nn.KLDivLoss() # this produces 0 training loss only
 
     if load_model:
         # Load stored model:
