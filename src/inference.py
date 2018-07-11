@@ -17,7 +17,7 @@ if torch.cuda.is_available():
     dtype = torch.cuda.FloatTensor
 
 clip_length = 20 #with 20 clips the loss seems to reach zero very fast
-number_of_videos = 10 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
+number_of_videos = 1 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 frame_size = (256, 192)
 pretrained_model = './SalConvLSTM.pt'
 
@@ -85,10 +85,12 @@ def main():
             for idx in range(clip.size()[0]):
                 #print(clip[idx].size()) needs unsqueeze
                 # Compute output
-                state, saliency_map = model.forward(clip[idx], state)
+                (hidden, cell), saliency_map = model.forward(clip[idx], state)
+                hidden = Variable(hidden.data)
+                cell = Variable(cell.data)
+                state = (hidden, cell)
 
             utils.save_image(clip[idx].data.cpu(), "./test/input{}.png".format(j))
             utils.save_image(saliency_map.data.cpu(), "./test/output{}.png".format(j))
-            exit()
 
 main()
