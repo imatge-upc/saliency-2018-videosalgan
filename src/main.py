@@ -63,6 +63,7 @@ def main(params = params):
         clip_length = clip_length,
         split = "train") #add a parameter node = training or validation
     print("Size of train set is {}".format(len(train_set)))
+
     val_set = DHF1K_frames(
         frame_size = frame_size,
         number_of_videos = number_of_videos,

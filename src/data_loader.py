@@ -90,9 +90,9 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
-          cv2.imwrite("./test/X2.png", X)
+          X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
+          cv2.imwrite("./test/X_after_norm.png", X)
           exit()
-          X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
           X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #X = Image.fromarray(X)
