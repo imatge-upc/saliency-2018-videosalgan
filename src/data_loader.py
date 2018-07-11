@@ -90,13 +90,16 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
           X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
+          cv2.imwrite("./test/X1.png", X)
           X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
+          cv2.imwrite("./test/X2.png", X)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
+          cv2.imwrite("./test/X3.png", X)
+          exit()
           #X = Image.fromarray(X)
           #if self.transforms is not None:
           #    X = self.transforms(X)
           #X = torch.from_numpy(X).unsqueeze(0) # Use unsqueeze because grayscale has 1 channel and it would be omitted but pytorch expects to see it. (something weird happens here probably, get back to it)
-          #cv2.imwrite("./test/X{}.png".format(i), X)
 
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
           y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
