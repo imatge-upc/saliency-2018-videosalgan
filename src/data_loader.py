@@ -90,7 +90,8 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
-          X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
+          #X = cv2.normalize(X, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
+          cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
           cv2.imwrite("./test/X_after_norm.png", X)
           exit()
           X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
