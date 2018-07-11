@@ -5,6 +5,8 @@ import datetime
 import numpy as np
 from torch.utils import data
 from PIL import Image
+from torchvision import utils
+
 
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
@@ -94,6 +96,7 @@ class DHF1K_frames(data.Dataset):
           #if self.transforms is not None:
           #    X = self.transforms(X)
           #X = torch.from_numpy(X).unsqueeze(0) # Use unsqueeze because grayscale has 1 channel and it would be omitted but pytorch expects to see it. (something weird happens here probably, get back to it)
+          #cv2.imwrite("./test/X{}.png".format(i), X)
 
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
           y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
@@ -123,6 +126,8 @@ class DHF1K_frames(data.Dataset):
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
             data = []
             gt = []
+            utils.save_image(data_tensor[0], "./test/dt{}.png".format(i))
+            exit()
 
 
         return packed
