@@ -100,10 +100,10 @@ class DHF1K_frames(data.Dataset):
 
           cv2.imwrite("./test/X.png", X)
           #print(X)
-          X = X.astype(np.float32)
-          #X = (X - X.min())/(X.max()-X.min())
-          X = X/255
-          cv2.imwrite("./test/X_after_norm.png", X)
+          #X = X.astype(np.float32)
+          # X = (X - X.min())/(X.max()-X.min())
+          X = norm_X*255
+          cv2.imwrite("./test/X_norm*255.png", X)
           print(X)
           exit()
           X = cv2.resize(norm_X, self.frame_size, interpolation=cv2.INTER_AREA)
