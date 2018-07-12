@@ -96,10 +96,12 @@ class DHF1K_frames(data.Dataset):
           if self.transforms:
             X = self.transforms(X)
           utils.save_image((X), "./test/X.png".format(i))
+          X = (X - X.min())/(X.max()-X.min())
+          utils.save_image((X), "./test/X_norm.png".format(i))
+          utils.save_image((X*255), "./test/X_unnorm.png".format(i))
           exit()
           # Normalize
           X = X.astype(np.float32)
-          X = (X - X.min())/(X.max()-X.min())
 
           """
           norm_X = np.zeros((size_ima[0], size_ima[1]))
