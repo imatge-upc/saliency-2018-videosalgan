@@ -95,7 +95,7 @@ def main():
                 cell = Variable(cell.data)
                 state = (hidden, cell)
 
-            utils.save_image(clip[idx].data.cpu()*255, "./test/input{}.png".format(j))
-            utils.save_image(saliency_map.data.cpu()*255, "./test/output{}.png".format(j))
+            utils.save_image(clip[idx].data.cpu(), "./test/input{}.png".format(j))
+            utils.save_image(saliency_map.data.cpu(), "./test/output{}.png".format(j))
 
 main()

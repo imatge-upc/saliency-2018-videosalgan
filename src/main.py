@@ -31,7 +31,7 @@ maps of 64 × 48. - Salgan paper
 """
 
 frame_size = 64 #64x36 10 times lower than the original
-learning_rate = 0.1 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out, at 10^-5 it goes down more smoothly, but it's not oscillating. It goes the same direction just much slower.
+learning_rate = 0.001 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out, at 10^-5 it goes down more smoothly, but it's not oscillating. It goes the same direction just much slower.
 decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
@@ -220,7 +220,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
                 else:
                     loss.backward(retain_graph=True)
 
-            if i == 0 and j == 0:
+            if i == 2 and j == 0:
                 utils.save_image(clip[idx], "./test/clip.png")
                 utils.save_image(saliency_map, "./test/smap.png")
 
