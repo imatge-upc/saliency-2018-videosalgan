@@ -18,7 +18,7 @@ if torch.cuda.is_available():
 
 clip_length = 20 #with 20 clips the loss seems to reach zero very fast
 number_of_videos = 1 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
-frame_size = (256, 192)
+frame_size = 256
 pretrained_model = './SalConvLSTM.pt'
 
 # Parameters
@@ -37,7 +37,7 @@ def main():
         clip_length = clip_length,
         split = "train",
         transforms = transforms.Compose([
-            transforms.Resize(256),
+            transforms.Resize(frame_size),
             transforms.ToTensor()
             ])
         )
