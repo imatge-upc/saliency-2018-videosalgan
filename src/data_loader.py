@@ -91,16 +91,18 @@ class DHF1K_frames(data.Dataset):
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
           """
+          """
           size_ima = X.shape
           norm_X = np.zeros((size_ima[0], size_ima[1]))
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
-          """
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
 
+
           cv2.imwrite("./test/X.png", X)
-          print(X)
+          #print(X)
           X = X.astype(np.float32)
-          X = (X - X.min())/(X.max()-X.min())
+          #X = (X - X.min())/(X.max()-X.min())
+          X = X/255
           cv2.imwrite("./test/X_after_norm.png", X)
           print(X)
           exit()
