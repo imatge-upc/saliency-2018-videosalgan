@@ -11,9 +11,9 @@ from torchvision import utils
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
 
-  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, frame_size = (256, 192)):
+  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, transforms = None):
 
-        self.frame_size = frame_size
+        self.transforms = transforms
         self.cl = clip_length
         self.frames_path = "/imatge/lpanagiotis/work/DHF1K/predictions" # in our case it's salgan saliency maps
         self.gt_path = "/imatge/lpanagiotis/work/DHF1K/maps" #ground truth
@@ -90,9 +90,13 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
-          X_tensor = torch.FloatTensor(X)
-          utils.save_image((X_tensor*255), "./test/X4.png".format(i))
-
+          from skimage import io
+          X = io.imread(path_to_frame)
+          X = Image.open(path_to_frame)
+          if self.transforms:
+            X = self.transforms(X)
+          utils.save_image((X), "./test/X.png".format(i))
+          exit()
           # Normalize
           X = X.astype(np.float32)
           X = (X - X.min())/(X.max()-X.min())
@@ -102,11 +106,6 @@ class DHF1K_frames(data.Dataset):
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
           """
-          cv2.imwrite("./test/X1.png",X*255)
-          X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
-          cv2.imwrite("./test/X2.png",X*255)
-          X = np.expand_dims(X, 0)
-          cv2.imwrite("./test/X3.png",X[0]*255)
           print(type(X[0]))
 
 

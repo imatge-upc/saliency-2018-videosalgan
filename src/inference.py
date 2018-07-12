@@ -33,10 +33,15 @@ def main():
 
     #Expect Error if either validation size or train size is 1
     dataset = DHF1K_frames(
-        frame_size = frame_size,
         number_of_videos = number_of_videos,
         clip_length = clip_length,
-        split = "train") #add a parameter node = training or validation
+        split = "train",
+        transforms = transforms.Compose([
+            transforms.Resize(256),
+            transforms.ToTensor()
+            ])
+        )
+         #add a parameter node = training or validation
     print("Size of test set is {}".format(len(dataset)))
 
     #print(len(dataset[0]))
