@@ -90,18 +90,15 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
-          from skimage import io
-          X = io.imread(path_to_frame)
+
           X = Image.open(path_to_frame)
           if self.transforms:
             X = self.transforms(X)
           utils.save_image((X), "./test/X.png".format(i))
           X = (X - X.min())/(X.max()-X.min())
+          print("Size:")
+          print(X.size())
           utils.save_image((X), "./test/X_norm.png".format(i))
-          utils.save_image((X*255), "./test/X_unnorm.png".format(i))
-          exit()
-          # Normalize
-          X = X.astype(np.float32)
 
           """
           norm_X = np.zeros((size_ima[0], size_ima[1]))
@@ -118,21 +115,23 @@ class DHF1K_frames(data.Dataset):
           #X = torch.from_numpy(X).unsqueeze(0) # Use unsqueeze because grayscale has 1 channel and it would be omitted but pytorch expects to see it. (something weird happens here probably, get back to it)
 
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
-          y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
 
-          # Normalize
-          y = y.astype(np.float32)
+          y = Image.open(path_to_frame)
+          if self.transforms:
+            y = self.transforms(y)
+          utils.save_image((y), "./test/y.png".format(i))
           y = (y - y.min())/(y.max()-y.min())
+          print("Size:")
+          print(y.size())
+          utils.save_image((y), "./test/X_norm.png".format(i))
 
-          y = cv2.resize(y, self.frame_size, interpolation=cv2.INTER_AREA)
-          y = np.expand_dims(y, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #y = Image.fromarray(y)
           #if self.transforms is not None:
           #    y = self.transforms(y)
           #y = torch.from_numpy(y).unsqueeze(0)
 
-          data.append(X)
-          gt.append(y)
+          data.append(X.unsqueeze(0))
+          gt.append(y.unsqueeze(0))
 
           """
           except RuntimeError:
@@ -145,21 +144,14 @@ class DHF1K_frames(data.Dataset):
           if (i+1)%self.cl == 0 or i == (len(frames)-1):
             #print(np.array(data).shape) #looks okay
 
-            cv2.imwrite("./test/data.png",data[0][0]*255)
-
-            print(type(data[0][0][0]))
-
-            data_tensor = torch.FloatTensor(data) #bug was actually here
-            gt_tensor = torch.FloatTensor(gt)
+            data_tensor = torch.cat(data,0) #bug was actually here
+            gt_tensor = torch.cat(gt,0)
+            print(data_tensor.size())
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
-            print(type(data_tensor[0][0]))
             data = []
             gt = []
-            print(data_tensor[0][0])
-            print(data_tensor[0][0]*255)
-            print(data_tensor[0][0].size())
-            utils.save_image((data_tensor[0][0]*255).type(torch.ByteTensor), "./test/dt{}.png".format(i))
-            utils.save_image((gt_tensor[0][0]*255).type(torch.ByteTensor), "./test/gt{}.png".format(i))
+            utils.save_image((data_tensor[0]), "./test/dt{}.png".format(i))
+            utils.save_image((gt_tensor[0]), "./test/gt{}.png".format(i))
             exit()
 
 
