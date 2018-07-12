@@ -105,6 +105,8 @@ class DHF1K_frames(data.Dataset):
           cv2.imwrite("./test/X2.png",X*255)
           X = np.expand_dims(X, 0)
           cv2.imwrite("./test/X3.png",X[0]*255)
+          X_tensor = torch.FloatTensor(X)
+          utils.save_image((X_tensor[0]*255), "./test/X4.png".format(i))
           print(type(X[0]))
 
 
@@ -152,10 +154,11 @@ class DHF1K_frames(data.Dataset):
             print(type(data_tensor[0][0]))
             data = []
             gt = []
-            print(data_tensor[0])
+            print(data_tensor[0][0])
+            print(data_tensor[0][0]*255)
+            print(data_tensor[0][0].size())
             utils.save_image((data_tensor[0][0]*255).type(torch.ByteTensor), "./test/dt{}.png".format(i))
             utils.save_image((gt_tensor[0][0]*255).type(torch.ByteTensor), "./test/gt{}.png".format(i))
-            print(data_tensor[0]*255)
             exit()
 
 
