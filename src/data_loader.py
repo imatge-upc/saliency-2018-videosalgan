@@ -98,7 +98,7 @@ class DHF1K_frames(data.Dataset):
 
           X = X.astype(np.float32)
           X = (X - X.min())/(X.max()-X.min())
-          cv2.imwrite("./test/X_after_norm_2.png", norm_X)
+          cv2.imwrite("./test/X_after_norm_2.png", X)
           exit()
           X = cv2.resize(norm_X, self.frame_size, interpolation=cv2.INTER_AREA)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
