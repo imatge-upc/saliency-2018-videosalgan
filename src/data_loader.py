@@ -90,23 +90,17 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
+
+          # Normalize
+          X = X.astype(np.float32)
+          X = (X - X.min())/(X.max()-X.min())
+
           """
-          """
-          size_ima = X.shape
           norm_X = np.zeros((size_ima[0], size_ima[1]))
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
-
-
-          cv2.imwrite("./test/X.png", X)
-          #print(X)
-          #X = X.astype(np.float32)
-          # X = (X - X.min())/(X.max()-X.min())
-          X = norm_X*255
-          cv2.imwrite("./test/X_norm*255.png", X)
-          print(X)
-          exit()
-          X = cv2.resize(norm_X, self.frame_size, interpolation=cv2.INTER_AREA)
+          """
+          X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #X = Image.fromarray(X)
           #if self.transforms is not None:
@@ -141,8 +135,8 @@ class DHF1K_frames(data.Dataset):
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
             data = []
             gt = []
-            utils.save_image(data_tensor[0], "./test/dt{}.png".format(i))
-            exit()
+            utils.save_image(data_tensor[0]*255, "./test/dt{}.png".format(i))
+            utils.save_image(gt_tensor[0]*255, "./test/gt{}.png".format(i))
 
 
         return packed
