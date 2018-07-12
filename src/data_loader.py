@@ -153,8 +153,8 @@ class DHF1K_frames(data.Dataset):
             data = []
             gt = []
             print(data_tensor[0])
-            utils.save_image((data_tensor[0]*255).type(torch.ByteTensor), "./test/dt{}.png".format(i))
-            utils.save_image((gt_tensor[0]*255).type(torch.ByteTensor), "./test/gt{}.png".format(i))
+            utils.save_image((data_tensor[0][0]*255).type(torch.ByteTensor), "./test/dt{}.png".format(i))
+            utils.save_image((gt_tensor[0][0]*255).type(torch.ByteTensor), "./test/gt{}.png".format(i))
             print(data_tensor[0]*255)
             exit()
 
