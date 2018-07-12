@@ -130,13 +130,16 @@ class DHF1K_frames(data.Dataset):
 
           if (i+1)%self.cl == 0 or i == (len(frames)-1):
             #print(np.array(data).shape) #looks okay
-            data_tensor = torch.ByteTensor(data) # unsigned integers
-            gt_tensor = torch.ByteTensor(gt) # unsigned integers
+            data_tensor = torch.FloatTensor(data) # unsigned integers
+            gt_tensor = torch.FloatTensor(gt) # unsigned integers
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
             data = []
             gt = []
+            print(data_tensor[0])
             utils.save_image(data_tensor[0]*255, "./test/dt{}.png".format(i))
             utils.save_image(gt_tensor[0]*255, "./test/gt{}.png".format(i))
+            print(data_tensor[0]*255)
+            exit()
 
 
         return packed
