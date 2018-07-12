@@ -100,11 +100,12 @@ class DHF1K_frames(data.Dataset):
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
           """
-          cv2.imwrite("X1.png",X*255)
+          cv2.imwrite("./test/X1.png",X*255)
           X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
-          cv2.imwrite("X2.png",X*255)
+          cv2.imwrite("./test/X2.png",X*255)
           X = np.expand_dims(X, 0)
-          cv2.imwrite("X3.png",X[0]*255)
+          cv2.imwrite("./test/X3.png",X[0]*255)
+          print(type(X[0]))
 
 
           # There is only one channel and python would automatically omit it, we need to avoid that.
@@ -140,9 +141,15 @@ class DHF1K_frames(data.Dataset):
 
           if (i+1)%self.cl == 0 or i == (len(frames)-1):
             #print(np.array(data).shape) #looks okay
+
+            cv2.imwrite("./test/data.png",data[0][0]*255)
+
+            print(type(data[0][0][0]))
+
             data_tensor = torch.FloatTensor(data) #bug was actually here
             gt_tensor = torch.FloatTensor(gt)
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
+            print(type(data_tensor[0][0]))
             data = []
             gt = []
             print(data_tensor[0])
