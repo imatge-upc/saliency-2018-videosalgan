@@ -90,6 +90,8 @@ class DHF1K_frames(data.Dataset):
           path_to_frame = os.path.join(self.frames_path, str(true_index), frame)
           print(path_to_frame) #path is good
           X = cv2.imread(path_to_frame, cv2.IMREAD_GRAYSCALE)
+          X_tensor = torch.FloatTensor(X)
+          utils.save_image((X_tensor*255), "./test/X4.png".format(i))
 
           # Normalize
           X = X.astype(np.float32)
@@ -105,8 +107,6 @@ class DHF1K_frames(data.Dataset):
           cv2.imwrite("./test/X2.png",X*255)
           X = np.expand_dims(X, 0)
           cv2.imwrite("./test/X3.png",X[0]*255)
-          X_tensor = torch.FloatTensor(X)
-          utils.save_image((X_tensor[0]*255), "./test/X4.png".format(i))
           print(type(X[0]))
 
 
