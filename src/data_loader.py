@@ -100,8 +100,14 @@ class DHF1K_frames(data.Dataset):
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
           """
+          cv2.imwrite("X1.png",X*255)
           X = cv2.resize(X, self.frame_size, interpolation=cv2.INTER_AREA)
-          X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
+          cv2.imwrite("X2.png",X*255)
+          X = np.expand_dims(X, 0)
+          cv2.imwrite("X3.png",X[0]*255)
+
+
+          # There is only one channel and python would automatically omit it, we need to avoid that.
           #X = Image.fromarray(X)
           #if self.transforms is not None:
           #    X = self.transforms(X)
@@ -109,7 +115,11 @@ class DHF1K_frames(data.Dataset):
 
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
           y = cv2.imread(path_to_gt, cv2.IMREAD_GRAYSCALE)
-          y = cv2.normalize(y, dst=None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize the image
+
+          # Normalize
+          y = y.astype(np.float32)
+          y = (y - y.min())/(y.max()-y.min())
+
           y = cv2.resize(y, self.frame_size, interpolation=cv2.INTER_AREA)
           y = np.expand_dims(y, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
           #y = Image.fromarray(y)
@@ -130,14 +140,14 @@ class DHF1K_frames(data.Dataset):
 
           if (i+1)%self.cl == 0 or i == (len(frames)-1):
             #print(np.array(data).shape) #looks okay
-            data_tensor = torch.FloatTensor(data) # unsigned integers
-            gt_tensor = torch.FloatTensor(gt) # unsigned integers
+            data_tensor = torch.FloatTensor(data) #bug was actually here
+            gt_tensor = torch.FloatTensor(gt)
             packed.append((data_tensor,gt_tensor)) # pack a list of data with the corresponding list of ground truths
             data = []
             gt = []
             print(data_tensor[0])
-            utils.save_image(data_tensor[0]*255, "./test/dt{}.png".format(i))
-            utils.save_image(gt_tensor[0]*255, "./test/gt{}.png".format(i))
+            utils.save_image((data_tensor[0]*255).type(torch.ByteTensor), "./test/dt{}.png".format(i))
+            utils.save_image((gt_tensor[0]*255).type(torch.ByteTensor), "./test/gt{}.png".format(i))
             print(data_tensor[0]*255)
             exit()
 
