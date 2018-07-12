@@ -94,7 +94,11 @@ class DHF1K_frames(data.Dataset):
           norm_X = np.zeros((size_ima[0], size_ima[1]))
           norm_X = cv2.normalize(X, dst=norm_X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F) #normalize is destroying the image
           #cv2.normalize(X, X, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX) #normalize is destroying the image
-          cv2.imwrite("./test/X_after_norm.png", norm_X)
+          cv2.imwrite("./test/X_after_norm_1.png", norm_X)
+
+          X = X.astype(np.float32)
+          X = (X - X.min())/(X.max()-X.min())
+          cv2.imwrite("./test/X_after_norm_2.png", norm_X)
           exit()
           X = cv2.resize(norm_X, self.frame_size, interpolation=cv2.INTER_AREA)
           X = np.expand_dims(X, 0) # There is only one channel and python would automatically omit it, we need to avoid that.
