@@ -5,16 +5,18 @@ from frame_extraction import frame_iterator
 
 
 # I want to extract the frames from the originally downloaded videos and put them in my directory so that they will not be backed up. I will also copy the annotations to make it easier to use later.
-original_directory           = "/projects/saliency/GTEA_Gaze/Videos/"
-video_files      = os.listdir(original_directory)
+original_directory = "/projects/saliency/GTEA_Gaze/raw_videos/"
+video_files = os.listdir(original_directory)
 
 extracted_frames_directory   = "/imatge/lpanagiotis/work/GTEA_Gaze/frames/"
+if not os.path.exists(extracted_frames_directory):
+    os.mkdir(extracted_frames_directory)
 
 for video_file in video_files:
     # The video is named something like "001.mpg"
-    number_of_file = video_file.split(".")[0]
+    name_of_file = video_file.split(".")[0]
     # My working directory path. Each video will have a folder of its own.
-    path_to_extracted_frames = os.path.join(extracted_frames_directory, str(number_of_file))
+    path_to_extracted_frames = os.path.join(extracted_frames_directory, str(name_of_file))
     if not os.path.exists(path_to_extracted_frames):
         os.mkdir(path_to_extracted_frames)
 
@@ -32,7 +34,7 @@ for video_file in video_files:
         """
         #It works!
 
-    print("Frames successfully extracted from video {}".format(number_of_file))
+    print("Frames successfully extracted from video {}".format(name_of_file))
 
 
 

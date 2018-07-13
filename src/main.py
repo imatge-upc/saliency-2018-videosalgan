@@ -11,7 +11,6 @@ from torch import nn
 from torch.utils import data
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
-
 from data_loader import DHF1K_frames
 
 dtype = torch.FloatTensor
@@ -30,8 +29,8 @@ a factor 1/4, which in our architecture corresponds to saliency
 maps of 64 × 48. - Salgan paper
 """
 
-frame_size = 64 #64x36 10 times lower than the original
-learning_rate = 0.00001 # try 0.001 looks better,  0.0001 0.22 average loss of 1 st epoch, 0.003 at 2nd epoch. the decrease is again rapid but doesnt zero out, at 10^-5 it goes down more smoothly, but it's not oscillating. It goes the same direction just much slower.
+frame_size = 64 # 5 times lower than the original
+learning_rate = 0.00001 #
 decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
@@ -40,7 +39,7 @@ epochs = 30
 plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
-clip_length = 20 #with 20 clips the loss seems to reach zero very fast
+clip_length = 10
 number_of_videos = 10 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
@@ -111,6 +110,7 @@ def main(params = params):
     cudnn.benchmark = True #https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
 
     optimizer = torch.optim.SGD(model.parameters(), learning_rate, momentum=momentum, weight_decay=weight_decay)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=4, min_lr=0.0000001)
 
 
     # =================================================
@@ -132,7 +132,8 @@ def main(params = params):
 
         # cuda error occurs here
         val_loss = validate(val_loader, model, criterion, epoch)
-
+        # if validation has not improved for a certain amount of epochs, reduce the learning rate:
+        scheduler.step(val_loss)
 
         if epoch % plot_every == 0:
             train_losses.append(train_loss.cpu())
