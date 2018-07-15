@@ -49,19 +49,19 @@ for name in file_names:
     else:
         print("No gaze data provided for {}".format(name))
 
-    frame_name = folder_of_frames[0]
+    frame_name = folder_of_frames[1]
     frame = cv2.imread(os.path.join(frames_path, name, frame_name))
     gt = np.zeros(frame.shape)
-    x = test_data_01[0, 0]
-    y = test_data_01[0, 1]
+    x = test_data_01[1, 0]
+    y = test_data_01[1, 1]
     print((x,y))
     px = x*gt.shape[0]
     py = y*gt.shape[1]
     print(px,py)
     frame[int(px), int(py)]=255
     gt[int(px), int(py)]=255
-    cv2.imwrite("test_frame.png",frame)
-    cv2.imwrite("test_gt.png",gt)
+    cv2.imwrite("test_frame{}.png".format(1),frame)
+    cv2.imwrite("test_gt{}.png".format(1),gt)
 
 
     break
