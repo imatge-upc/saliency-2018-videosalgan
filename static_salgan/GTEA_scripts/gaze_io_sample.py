@@ -128,22 +128,22 @@ if __name__== "__main__":
     test_file_01 = './gaze_data/OP01-R01-PastaSalad.txt'
     test_data_01 = parse_gtea_gaze(test_file_01)
     # print the loaded gaze
-    print 'Loaded gaze data from {:s}'.format(test_file_01)
-    print 'Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
+    print( 'Loaded gaze data from {:s}'.format(test_file_01))
+    print( 'Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
             1000,
             test_data_01[1000, 0],
             test_data_01[1000, 1],
             gaze_type[int(test_data_01[1000, 2])]
-        )
-    #print(test_data_01.shape)
+        ))
+    #print((test_data_01.shape)
     # new version
     test_file_02 = './gaze_data/P16-R03-BaconAndEggs.txt'
     test_data_02 = parse_gtea_gaze(test_file_02)
     # print the loaded gaze
-    print 'Loaded gaze data from {:s}'.format(test_file_02)
-    print 'Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
+    print( 'Loaded gaze data from {:s}'.format(test_file_02))
+    print( 'Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
             1000,
             test_data_02[1000, 0],
             test_data_02[1000, 1],
             gaze_type[int(test_data_02[1000, 2])]
-        )
+        ))

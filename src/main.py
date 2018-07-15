@@ -35,12 +35,12 @@ decay_rate = 0.1
 momentum = 0.9
 weight_decay = 1e-4
 start_epoch = 1
-epochs = 30
+epochs = 10
 plot_every = 1
 load_model = False
 pretrained_model = './SalConvLSTM.pt'
 clip_length = 10
-number_of_videos = 10 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
+number_of_videos = 700 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
 writer = SummaryWriter('./log') #Tensorboard
@@ -125,7 +125,7 @@ def main(params = params):
     starting_time = datetime.datetime.now().replace(microsecond=0)
     print("Training started at : {}".format(starting_time))
     for epoch in range(start_epoch, epochs):
-        adjust_learning_rate(optimizer, epoch, decay_rate)
+        #adjust_learning_rate(optimizer, epoch, decay_rate)
 
         # train for one epoch
         train_loss = train(train_loader, model, criterion, optimizer, epoch)
