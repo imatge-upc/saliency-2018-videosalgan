@@ -59,8 +59,9 @@ for name in file_names:
     py = y*gt.shape[1]
     print(px,py)
     frame[int(px), int(py)]=255
-    cv2.imshow("fr",frame)
+    gt[int(px), int(py)]=255
     cv2.imwrite("test_frame.png",frame)
+    cv2.imwrite("test_gt.png",gt)
 
 
     break
