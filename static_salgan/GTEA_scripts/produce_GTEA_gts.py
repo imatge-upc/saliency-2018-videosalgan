@@ -55,8 +55,8 @@ for name in file_names:
     x = test_data_01[1, 0]
     y = test_data_01[1, 1]
     print((x,y))
-    px = x*gt.shape[0]
-    py = y*gt.shape[1]
+    px = x*gt.shape[1]
+    py = y*gt.shape[0]
     print(px,py)
     frame[int(px), int(py)]=255
     gt[int(px), int(py)]=255
