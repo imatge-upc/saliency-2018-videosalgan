@@ -63,6 +63,8 @@ class DHF1K_frames(data.Dataset):
           self.video_list = self.video_list[limit:]
           self.gts_list = self.gts_list[limit:]
           self.first_video_no = limit+1
+        elif split == None:
+          self.first_video_no = 1
 
 
 
