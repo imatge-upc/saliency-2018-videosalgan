@@ -10,12 +10,12 @@ from torchvision import utils
 # The DataLoader for our specific video datataset with extracted frames
 class DHF1K_frames(data.Dataset):
 
-  def __init__(self, split, clip_length, number_of_videos, val_perc = 0.15, transforms = None):
+  def __init__(self, split, clip_length, number_of_videos, frames_path = "/imatge/lpanagiotis/work/DHF1K/predictions", gt_path = "/imatge/lpanagiotis/work/DHF1K/maps",  val_perc = 0.15, transforms = None):
 
         self.transforms = transforms
         self.cl = clip_length
-        self.frames_path = "/imatge/lpanagiotis/work/DHF1K/predictions" # in our case it's salgan saliency maps
-        self.gt_path = "/imatge/lpanagiotis/work/DHF1K/maps" #ground truth
+        self.frames_path = frames_path # in our case it's salgan saliency maps
+        self.gt_path = gt_path#ground truth
 
 
         # A list to keep all video lists of salgan predictions, which will be our dataset.

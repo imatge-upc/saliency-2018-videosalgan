@@ -4,7 +4,7 @@ import numpy as np
 from gaze_io_sample import parse_gtea_gaze
 
 gaze_path = "/imatge/lpanagiotis/projects/saliency/GTEA_Gaze/gaze_data"
-frames_path = "/imatge/lpanagiotis/work/GTEA_Gaze/temp"
+frames_path = "/imatge/lpanagiotis/work/GTEA_Gaze/frames"
 
 # gaze type
 gaze_type = ['untracked', 'fixation', 'saccade', 'unknown', 'truncated']
@@ -21,7 +21,7 @@ for file_name in file_names:
         files[name]=0
 """
 example_name = "P10-R01-PastaSalad"
-example_name = "P21-R06-GreekSalad"
+example_name = "OP02-R07-Pizza"
 
 for name in file_names:
     name = example_name
@@ -52,6 +52,7 @@ for name in file_names:
     for i in range(10):
         frame_name = folder_of_frames[i]
         frame = cv2.imread(os.path.join(frames_path, name, frame_name))
+        print(frame.shape)
         gt = np.zeros(frame.shape)
         x = test_data_01[i, 0]
         y = test_data_01[i, 1]

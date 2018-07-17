@@ -47,7 +47,7 @@ def frame_iterator(filename, max_num_frames):
 original_directory = "/projects/saliency/GTEA_Gaze/raw_videos/"
 video_files = os.listdir(original_directory)
 
-extracted_frames_directory   = "/imatge/lpanagiotis/work/GTEA_Gaze/temp/"
+extracted_frames_directory   = "/imatge/lpanagiotis/work/GTEA_Gaze/frames/"
 if not os.path.exists(extracted_frames_directory):
     os.mkdir(extracted_frames_directory)
 
@@ -62,8 +62,6 @@ for video_file in video_files:
     count = 0
     for frame in frame_iterator(os.path.join(original_directory, video_file), max_num_frames=100000 ):
         count+=1
-        if count == 1:
-            continue
         path_to_new_frame = os.path.join(path_to_extracted_frames, str(count)+".png")
         cv2.imwrite(path_to_new_frame, frame)
         """
@@ -75,9 +73,6 @@ for video_file in video_files:
         #It works!
 
     print("Frames successfully extracted from video {}".format(name_of_file))
-
-    if count > 2:
-        break
 
 
 
