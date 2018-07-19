@@ -5,8 +5,8 @@ DHF1K paper: "we  employ  five  classic  met-rics,  namely  Normalized  Scanpath
 import cv2
 import os
 import numpy as np
-import time
 import pickle
+import datetime
 
 gt_directory = "/imatge/lpanagiotis/work/DHF1K/maps"
 #sm_directory = "/imatge/lpanagiotis/work/DHF1K/predictions"
@@ -14,7 +14,6 @@ sm_directory = "/imatge/lpanagiotis/work/DHF1K/clstm_predictions"
 
 final_metric_list = []
 # The directories are named 1-1000 so it should be easy to iterate over them
-
 def inner_worker(i, packed, gt_path, sm_path): #packed should be a list of tuples (annotation, prediction)
 
     gt, sm = packed
@@ -36,11 +35,8 @@ def inner_worker(i, packed, gt_path, sm_path): #packed should be a list of tuple
                     CC,
                     SIM )
 
+start = datetime.datetime.now().replace(microsecond=0)
 for i in range(1,701):
-
-
-    start = time.clock()
-
 
     gt_path = os.path.join(gt_directory, str(i))
     sm_path = os.path.join(sm_directory, str(i))
@@ -55,7 +51,6 @@ for i in range(1,701):
 ##
     ##https://stackoverflow.com/questions/35663498/how-do-i-return-a-matrix-with-joblib-python
     from joblib import Parallel, delayed
-    start = time.clock()
     metric_list = Parallel(n_jobs=8)(delayed(inner_worker)(n, packed, gt_path, sm_path) for n, packed in enumerate(pack)) #run 8 frames simultaneously
 
     aucj_mean = np.mean([x[0] for x in metric_list])
@@ -70,7 +65,7 @@ for i in range(1,701):
     print("NSS is {}".format(nss_mean))
     print("CC is {}".format(cc_mean))
     print("SIM is {}".format(sim_mean))
-    print("Time elapsed: {}".format(time.clock()-start))
+    print("Time elapsed so far: {}".format(datetime.datetime.now().replace(microsecond=0)-start))
     print("==============================")
 
     final_metric_list.append(( aucj_mean,
