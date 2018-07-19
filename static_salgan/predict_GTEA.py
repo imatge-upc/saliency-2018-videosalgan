@@ -24,8 +24,8 @@ def main():
     # Here need to specify the epoch of model sanpshot
     load_weights(model.net['output'], path='gen_', epochtoload=90)
 
-    src = "/imatge/lpanagiotis/projects/saliency/GTEA_Gaze/Images"
-    dst = "/imatge/lpanagiotis/projects/saliency/GTEA_Gaze/Smaps"
+    src = "/imatge/lpanagiotis/work/GTEA_Gaze/frames"
+    dst = "/imatge/lpanagiotis/work/GTEA_Gaze/predictions"
 
     frames = os.listdir(src)
     if not os.path.exists(dst):
