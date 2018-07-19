@@ -69,20 +69,22 @@ for name in file_names:
     for i in range(number_of_frames):
         frame_name = folder_of_frames[i]
         frame = cv2.imread(os.path.join(frames_path, name, frame_name))
-        print(frame.shape)
+        #print(frame.shape)
         gt = np.zeros(frame.shape)
         x = test_data_01[i, 1]
         y = test_data_01[i, 0]
-        print((x,y))
+        #print((x,y))
 
         """
         This produces index error
+        x = test_data_01[i, 0]
+        y = test_data_01[i, 1]
         px = x*gt.shape[1]
         py = y*gt.shape[0]
         """
         px = x*gt.shape[0]
         py = y*gt.shape[1]
-        print(px,py)
+        #print(px,py)
         frame[int(px), int(py)]=255
         gt[int(px), int(py)]=255
         path_to_output = os.path.join(path_to_folder, "{}.png".format(i))
