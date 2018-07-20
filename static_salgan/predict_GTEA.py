@@ -13,8 +13,10 @@ def test(path_to_images, path_output_maps, model_to_test=None):
     # Load Data
     list_img_files.sort()
     for curr_file in tqdm(list_img_files, ncols=20):
-        print os.path.join(path_to_images, curr_file + '.jpg')
-        img = cv2.cvtColor(cv2.imread(os.path.join(path_to_images, curr_file + '.jpg'), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB) #Changed to .png
+        print( os.path.join(path_to_images, curr_file + '.png') )
+        img = cv2.imread(os.path.join(path_to_images, curr_file + '.png'), cv2.IMREAD_COLOR)
+        #print(img.shape)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #Changed to .png
         predict(model=model_to_test, image_stimuli=img, name=curr_file, path_output_maps=path_output_maps)
 
 
@@ -26,13 +28,17 @@ def main():
 
     src = "/imatge/lpanagiotis/work/GTEA_Gaze/frames"
     dst = "/imatge/lpanagiotis/work/GTEA_Gaze/predictions"
-
-    frames = os.listdir(src)
     if not os.path.exists(dst):
         os.mkdir(dst)
 
-    # Here need to specify the path to images and output path
-    test(path_to_images = src, path_output_maps = dst, model_to_test = model)
+    folders = os.listdir(src)
+    for recipe_folder in folders:
+        complete_src = os.path.join(src, recipe_folder)
+        complete_dst = os.path.join(dst, recipe_folder)
+        if not os.path.exists(complete_dst):
+            os.mkdir(complete_dst)
+        # Here need to specify the path to images and output path
+        test(path_to_images = complete_src, path_output_maps = complete_dst, model_to_test = model)
 
 if __name__ == "__main__":
     main()

@@ -36,7 +36,7 @@ def inner_worker(i, packed, gt_path, sm_path): #packed should be a list of tuple
                     SIM )
 
 start = datetime.datetime.now().replace(microsecond=0)
-for i in range(1,701):
+for i in range(58,701):
 
     gt_path = os.path.join(gt_directory, str(i))
     sm_path = os.path.join(sm_directory, str(i))
