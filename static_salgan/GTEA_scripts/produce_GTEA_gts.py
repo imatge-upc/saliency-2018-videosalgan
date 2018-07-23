@@ -31,7 +31,9 @@ for file_name in file_names:
 start = datetime.datetime.now().replace(microsecond=0)
 
 print("Commencing production of maps at time {}".format(start))
-for name in file_names:
+for i, name in enumerate(file_names):
+    if i < 30:
+        continue
     #name = example_name
     test_file_01 = os.path.join(gaze_path, name+".txt")
     #print(test_file_01)
@@ -66,19 +68,24 @@ for name in file_names:
     if not os.path.exists(path_to_folder):
         os.mkdir(path_to_folder)
 
-    for i in range(number_of_frames):
-        frame_name = folder_of_frames[i]
+    if number_of_frames < test_data_01.shape[0]:
+        iterator = number_of_frames
+    else:
+        iterator = test_data_01.shape[0]
+
+    for j in range(iterator):
+        frame_name = folder_of_frames[j]
         frame = cv2.imread(os.path.join(frames_path, name, frame_name))
         #print(frame.shape)
         gt = np.zeros(frame.shape)
-        x = test_data_01[i, 1]
-        y = test_data_01[i, 0]
+        x = test_data_01[j, 1]
+        y = test_data_01[j, 0]
         #print((x,y))
 
         """
         This produces index error
-        x = test_data_01[i, 0]
-        y = test_data_01[i, 1]
+        x = test_data_01[j, 0]
+        y = test_data_01[j, 1]
         px = x*gt.shape[1]
         py = y*gt.shape[0]
         """
@@ -87,7 +94,7 @@ for name in file_names:
         #print(px,py)
         frame[int(px), int(py)]=255
         gt[int(px), int(py)]=255
-        path_to_output = os.path.join(path_to_folder, "{}.png".format(i))
+        path_to_output = os.path.join(path_to_folder, "{}.png".format(j))
         cv2.imwrite( path_to_output, gt )
 
     print("Time elapsed so far: {}".format(datetime.datetime.now().replace(microsecond=0)-start))

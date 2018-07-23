@@ -52,6 +52,8 @@ def main():
                     os.mkdir(destination_dir)
 
                 test(path_to_images=source_video, path_output_maps=destination_dir, model_to_test=model)
+            break
+        break
 
 if __name__ == "__main__":
     main()

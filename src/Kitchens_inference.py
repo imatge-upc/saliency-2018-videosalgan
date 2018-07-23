@@ -9,7 +9,7 @@ import torch.backends.cudnn as cudnn
 from torch import nn
 from torch.utils import data
 from torch.autograd import Variable
-from data_loader import EgoMon_frames
+from data_loader import EpicKitchen_frames
 
 dtype = torch.FloatTensor
 if torch.cuda.is_available():
@@ -18,8 +18,18 @@ if torch.cuda.is_available():
 clip_length = 10
 pretrained_model = './SalConvLSTM.pt'
 
+""" EgoMon
 src = "/imatge/lpanagiotis/projects/saliency/public_html/2016-egomon/egomon_saliency_maps"
 dst = "/imatge/lpanagiotis/work/Egomon/clstm_predictions"
+"""
+""" GTEA
+src = "/imatge/lpanagiotis/work/GTEA_Gaze/predictions"
+dst = "/imatge/lpanagiotis/work/GTEA_Gaze/clstm_predictions"
+"""
+# Shape is 1080, 1920. Gotta downsample to infer
+frame_size = 360
+src = "/imatge/lpanagiotis/work/Epic-Kitchens/saliency_maps"
+dst = "/imatge/lpanagiotis/work/Epic-Kitchens/clstm_predictions"
 # Parameters
 params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
           'num_workers': 4,
@@ -31,17 +41,18 @@ def main():
     # ================ Data Loading ===================
 
     #Expect Error if either validation size or train size is 1
-    dataset = EgoMon_frames(
+    dataset = EpicKitchen_frames(
         frames_path = src,
         clip_length = clip_length,
         transforms = transforms.Compose([
+            transforms.Resize(frame_size),
             transforms.ToTensor()
             ])
         )
          #add a parameter node = training or validation
     print("Size of test set is {}".format(len(dataset)))
-    activity = dataset.match_i_to_act
-    print(activity)
+    path_to_vid = dataset.match_i_to_vid_path
+    print(path_to_vid)
 
     #print(len(dataset[0]))
     #print(len(dataset[1]))
@@ -78,10 +89,13 @@ def main():
     # switch to evaluate mode
     model.eval()
 
+
+    start = datetime.datetime.now().replace(microsecond=0) # Gives accurate human readable time, rounded down not to include too many decimals
+
     for i, video in enumerate(loader):
-        video_dst = os.path.join(dst, activity[i])
+        video_dst = path_to_vid[i]
         if not os.path.exists(video_dst):
-            os.mkdir(video_dst)
+            os.makedirs(video_dst)
 
         count = 0
         state = None # Initially no hidden state
@@ -98,7 +112,8 @@ def main():
                 utils.save_image(saliency_map.data.cpu(), os.path.join(video_dst, frame_names[idx][0]))
                 # j*clip_length+idx because we are iterating over batches of images and +1 because we don't want to start naming at 0
 
-        print("Done with video '{}'".format(activity[i]))
+        print("Done with video '{}'".format(i))
+        print("Time elapsed so far: {}".format(datetime.datetime.now().replace(microsecond=0)-start))
 
     print("Inference Done")
 

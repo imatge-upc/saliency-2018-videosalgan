@@ -123,8 +123,8 @@ class DHF1K_frames(data.Dataset):
 
 
 
-# DataLoader for inference
-class EgoMon_frames(data.Dataset):
+# DataLoader for inference Works for EgoMon and GTEA
+class Ego_frames(data.Dataset):
 
   def __init__(self, clip_length, frames_path, transforms = None):
 
@@ -192,6 +192,78 @@ class EgoMon_frames(data.Dataset):
 
 
 
+# DataLoader for inference
+class EpicKitchen_frames(data.Dataset):
+
+  def __init__(self, clip_length, frames_path, transforms = None):
+
+        self.transforms = transforms
+        self.cl = clip_length
+        self.frames_path = frames_path # in our case it's salgan saliency maps
+
+        self.video_dict = {}
+
+        start = datetime.datetime.now().replace(microsecond=0) # Gives accurate human readable time, rounded down not to include too many decimals
+        activities_folders = os.listdir(frames_path)
+        self.match_i_to_vid_path = {}
+        count = 0
+        for x in ["train", "test"]:
+          root_path = os.path.join(frames_path, x)
+          people = os.listdir(root_path)
+          for person in people:
+            person_path = os.path.join(frames_path, x, person)
+            videos = os.listdir(person_path)
+
+            for video in videos: #Every video is a directory
+                # Define our source file
+                source_video = os.path.join(person_path, video)
+                # Define our destination directory
+                self.match_i_to_vid_path[count] = source_video
+
+                frame_files = os.listdir(source_video)
+                frame_files_sorted = sorted(frame_files)
+                self.video_dict[count]=frame_files_sorted
 
 
+                count+=1
 
+            print("Frames for {} organized.".format(person))
+            print("Time elapsed so far: {}".format(datetime.datetime.now().replace(microsecond=0)-start))
+
+
+  def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.video_dict.keys())
+
+  def __getitem__(self, video_index):
+
+        'Generates one sample of data'
+        src_vid = self.match_i_to_vid_path[video_index]
+        frames = self.video_dict[video_index]
+        # Select sample video (frame list), in our case saliency map list
+        data = []
+        frame_names = []
+        packed = []
+        for i, frame in enumerate(frames):
+          # Load data
+          path_to_frame = os.path.join(src_vid, frame)
+
+          X = Image.open(path_to_frame).convert("L")
+          if self.transforms:
+            X = self.transforms(X)
+          X = (X - X.min())/(X.max()-X.min()) # Normalize min 0 max 1
+
+          data.append(X.unsqueeze(0))
+          frame_names.append(frame)
+
+          if (i+1)%self.cl == 0 or i == (len(frames)-1):
+            #print(np.array(data).shape) #looks okay
+
+            data_tensor = torch.cat(data,0) #bug was actually here
+            packed.append((frame_names, data_tensor))
+            data = []
+            frame_names = []
+
+        #print("Maybe inside here")
+
+        return packed

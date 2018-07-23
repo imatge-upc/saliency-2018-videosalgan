@@ -12,7 +12,15 @@ gt_directory = "/imatge/lpanagiotis/work/DHF1K/maps"
 #sm_directory = "/imatge/lpanagiotis/work/DHF1K/predictions"
 sm_directory = "/imatge/lpanagiotis/work/DHF1K/clstm_predictions"
 
-final_metric_list = []
+continue_calculations = False
+
+if continue_calculations:
+    with open('metrics.txt', 'rb') as handle:
+        final_metric_list = pickle.load(handle)
+else:
+    final_metric_list = []
+
+
 # The directories are named 1-1000 so it should be easy to iterate over them
 def inner_worker(i, packed, gt_path, sm_path): #packed should be a list of tuples (annotation, prediction)
 
@@ -36,8 +44,10 @@ def inner_worker(i, packed, gt_path, sm_path): #packed should be a list of tuple
                     SIM )
 
 start = datetime.datetime.now().replace(microsecond=0)
-for i in range(58,701):
+for i in range(1,701):
 
+    if i == 57: #Some unknown error occurs at this file, skip it
+        continue
     gt_path = os.path.join(gt_directory, str(i))
     sm_path = os.path.join(sm_directory, str(i))
 
