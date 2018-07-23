@@ -93,7 +93,7 @@ def main():
     start = datetime.datetime.now().replace(microsecond=0) # Gives accurate human readable time, rounded down not to include too many decimals
 
     for i, video in enumerate(loader):
-        video_dst = path_to_vid[i]
+        video_dst = path_to_vid[i].replace("saliency_maps", "clstm_predictions")
         if not os.path.exists(video_dst):
             os.makedirs(video_dst)
 
