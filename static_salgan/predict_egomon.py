@@ -25,7 +25,7 @@ def main():
     load_weights(model.net['output'], path='gen_', epochtoload=90)
 
     src = "/imatge/lpanagiotis/projects/saliency/public_html/2016-egomon/video_clean"
-    dst = "/imatge/lpanagiotis/work/Egomon/saliency_maps"
+    dst = "/imatge/lpanagiotis/work/Egomon/temp"
 
     folders = os.listdir(src)
     for folder in folders:

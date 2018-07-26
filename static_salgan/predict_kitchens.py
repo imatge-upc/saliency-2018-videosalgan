@@ -50,10 +50,8 @@ def main():
                 destination_dir = os.path.join(dst, x, person, video)
                 if not os.path.exists(destination_dir):
                     os.mkdir(destination_dir)
-
+                print("destination is {}".format(destination_dir))
                 test(path_to_images=source_video, path_output_maps=destination_dir, model_to_test=model)
-            break
-        break
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,12 @@ src = "/imatge/lpanagiotis/work/Epic-Kitchens/saliency_maps"
 
 dst = "/imatge/lpanagiotis/projects/saliency/public_html/epic-kitchens/saliency_maps"
 
+"""
+src = "/imatge/lpanagiotis/work/Epic-Kitchens/clstm_predictions"
+
+dst = "/imatge/lpanagiotis/projects/saliency/public_html/epic-kitchens/dynamic_saliency_maps"
+"""
+
 # Folder Structure corresponds to : train/test -> person -> videos
 
 def main():

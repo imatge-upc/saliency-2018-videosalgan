@@ -32,13 +32,11 @@ start = datetime.datetime.now().replace(microsecond=0)
 
 print("Commencing production of maps at time {}".format(start))
 for i, name in enumerate(file_names):
-    if i < 30:
-        continue
     #name = example_name
     test_file_01 = os.path.join(gaze_path, name+".txt")
     #print(test_file_01)
     #print(name)
-    folder_of_frames = os.listdir(os.path.join(frames_path, name))
+    folder_of_frames = sorted(os.listdir(os.path.join(frames_path, name)), key = lambda x: int(x.split(".")[0]))
     number_of_frames = len(folder_of_frames)
 
     if os.path.exists(test_file_01):
@@ -54,7 +52,7 @@ for i, name in enumerate(file_names):
         ))
         """
 
-        print("Number of frame in my data : {} \n Number of frames in their gaze data : {}".format(number_of_frames, test_data_01.shape[0]))
+        print("Number of frames in my data : {} \n Number of frames in their gaze data : {}".format(number_of_frames, test_data_01.shape[0]))
 
     else:
         import pickle
@@ -75,6 +73,7 @@ for i, name in enumerate(file_names):
 
     for j in range(iterator):
         frame_name = folder_of_frames[j]
+        #print(frame_name)
         frame = cv2.imread(os.path.join(frames_path, name, frame_name))
         #print(frame.shape)
         gt = np.zeros(frame.shape)

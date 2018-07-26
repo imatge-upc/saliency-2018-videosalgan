@@ -197,11 +197,12 @@ def auc_shuff(s_map,gt,other_map,splits=100,stepsize=0.1):
 
 
 
-def nss(s_map,gt):
-	#gt = discretize_gt(gt)
+def nss(s_map,gt,gt_is_image=True):
+
+	gt = discretize_gt(gt)
+	x,y = np.where(gt==1)
 	s_map_norm = (s_map - np.mean(s_map))/np.std(s_map)
 
-	x,y = np.where(gt==1)
 	temp = []
 	for i in zip(x,y):
 		temp.append(s_map_norm[i[0],i[1]])
