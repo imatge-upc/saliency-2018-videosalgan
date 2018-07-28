@@ -72,3 +72,28 @@ class ConvLSTMCell(nn.Module):
         saliency_map = self.conv1x1(cell)
 
         return (hidden, cell), saliency_map
+
+
+
+#For ablation study
+class Conv(nn.Module):
+    """
+    Generate a convolutional LSTM cell
+    """
+
+    def __init__(self, use_gpu, input_size, hidden_size, kernel_size):
+        super(ConvLSTMCell,self).__init__()
+        self.use_gpu = use_gpu
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.conv = nn.Conv2d(in_channels = input_size, out_channels = filter_size, kernel_size = kernel_size, padding = 1) #padding 1 to preserve HxW dimensions
+        self.conv1x1 = nn.Conv2d(in_channels = filter_size, out_channels = 1, kernel_size = 1)
+
+    def forward(self, input_, prev_state=None):
+
+        x = self.conv(input_)
+        saliency_map = self.conv1x1(x)
+
+        return saliency_map
+
+

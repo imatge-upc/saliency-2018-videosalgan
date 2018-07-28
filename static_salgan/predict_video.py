@@ -26,7 +26,7 @@ def main():
     #In my case I need to do it for every video folder, so
     for i in range(1,1001):
         print("Now predicting for video number {}".format(i))
-        new_directory=os.path.join("/imatge/lpanagiotis/work/DHF1K_extracted/predictions",str(i))
+        new_directory=os.path.join("/imatge/lpanagiotis/work/DHF1K_extracted/temp",str(i))
         if not os.path.exists(new_directory):
             os.mkdir(new_directory)
 

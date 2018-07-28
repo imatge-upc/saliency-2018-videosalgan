@@ -9,5 +9,5 @@ DIR_TO_SAVE = './test'
 
 # path to pretrained weights
 # PATH_TO_VGG16_WEIGHTS = '/imatge/jpan/saliency-salgan-2017/vgg16.pkl'
-PATH_TO_VGG16_WEIGHTS = '/imatge/lpanagiotis/salgan/src/vgg16.pkl'
+PATH_TO_VGG16_WEIGHTS = '/imatge/lpanagiotis/video-salgan-2018/vgg16.pkl'
 
