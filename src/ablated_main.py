@@ -42,8 +42,6 @@ clip_length = 1
 number_of_videos = 700 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
 
 
-writer = SummaryWriter('./log') #Tensorboard
-
 # Parameters
 params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
           'num_workers': 4,

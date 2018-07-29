@@ -81,7 +81,7 @@ class Conv(nn.Module):
     Generate a convolutional LSTM cell
     """
 
-    def __init__(self, use_gpu, input_size, hidden_size, kernel_size):
+    def __init__(self, use_gpu, input_size, filter_size, kernel_size):
         super(ConvLSTMCell,self).__init__()
         self.use_gpu = use_gpu
         self.input_size = input_size
