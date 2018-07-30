@@ -82,10 +82,9 @@ class Conv(nn.Module):
     """
 
     def __init__(self, use_gpu, input_size, filter_size, kernel_size):
-        super(ConvLSTMCell,self).__init__()
+        super(Conv,self).__init__()
         self.use_gpu = use_gpu
         self.input_size = input_size
-        self.hidden_size = hidden_size
         self.conv = nn.Conv2d(in_channels = input_size, out_channels = filter_size, kernel_size = kernel_size, padding = 1) #padding 1 to preserve HxW dimensions
         self.conv1x1 = nn.Conv2d(in_channels = filter_size, out_channels = 1, kernel_size = 1)
 

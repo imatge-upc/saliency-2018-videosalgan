@@ -18,10 +18,13 @@ if torch.cuda.is_available():
 
 clip_length = 10 #with 10 clips the loss seems to reach zero very fast
 number_of_videos = 700 # DHF1K offers 700 labeled videos, the other 300 are held back by the authors
-pretrained_model = './SalConvLSTM.pt'
+#pretrained_model = './SalConvLSTM.pt'
+pretrained_model = './Ablated_Model_No_LSTM.pt'
 
 
-dst = "/imatge/lpanagiotis/work/DHF1K/clstm_predictions"
+
+#dst = "/imatge/lpanagiotis/work/DHF1K/clstm_predictions"
+dst = "/imatge/lpanagiotis/work/DHF1K/abl_predictions"
 # Parameters
 params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
           'num_workers': 4,
@@ -76,6 +79,8 @@ def main():
 
     if not os.path.exists(dst):
         os.mkdir(dst)
+    else:
+        print("Be warned, you are about to write on an existing folder. If this is not intentional cancel now.")
 
     # switch to evaluate mode
     model.eval()

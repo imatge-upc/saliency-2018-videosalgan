@@ -127,7 +127,6 @@ def main(params = params):
         # train for one epoch
         train_loss = train(train_loader, model, criterion, optimizer, epoch)
 
-        # cuda error occurs here
         val_loss = validate(val_loader, model, criterion, epoch)
         # if validation has not improved for a certain amount of epochs, reduce the learning rate:
         scheduler.step(val_loss)
@@ -147,7 +146,7 @@ def main(params = params):
         'epoch': epoch + 1,
         'state_dict': model.cpu().state_dict(),
         'optimizer' : optimizer.state_dict()
-        }, 'SalConvLSTM.pt')
+        }, pretrained_model)
     """
     hyperparameters = {
         'momentum' : momentum,
@@ -201,8 +200,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
             frame = Variable(frame.type(dtype).t())
             gt = Variable(gt.type(dtype).t())
 
-            frame.squeeze(0)
-            gt.squeeze(0)
+            #print(frame.size())
+            frame.squeeze_(0)
+            gt.squeeze_(0)
+            #print(frame.size())
             # Compute output
             saliency_map = model.forward(frame)
             # Compute loss
@@ -214,7 +215,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
             optimizer.step()
 
             if i == 2 and j == 0:
-                utils.save_image(frame[idx], "./test/frame.png")
+                utils.save_image(frame, "./test/frame.png")
                 utils.save_image(saliency_map, "./test/sm.png")
 
             # Compute gradient and do optimizing step
@@ -251,8 +252,8 @@ def validate(val_loader, model, criterion, epoch):
             gt = Variable(gt.type(dtype).t(), requires_grad=False)
 
 
-            frame.squeeze(0)
-            gt.squeeze(0)
+            frame.squeeze_(0)
+            gt.squeeze_(0)
             # Compute output
             saliency_map = model.forward(frame)
             # Compute loss

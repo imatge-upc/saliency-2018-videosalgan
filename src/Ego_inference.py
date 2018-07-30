@@ -16,17 +16,19 @@ if torch.cuda.is_available():
     dtype = torch.cuda.FloatTensor
 
 clip_length = 5
-pretrained_model = './SalConvLSTM.pt'
+#pretrained_model = './SalConvLSTM.pt'
+pretrained_model = './Ablated_Model_No_LSTM.pt'
 
-""" EgoMon
+# EgoMon
 src = "/imatge/lpanagiotis/projects/saliency/public_html/2016-egomon/egomon_saliency_maps"
-dst = "/imatge/lpanagiotis/work/Egomon/clstm_predictions"
-"""
-# GTEA
+#dst = "/imatge/lpanagiotis/work/Egomon/clstm_predictions"
+dst = "/imatge/lpanagiotis/work/Egomon/abl_predictions"
+""" GTEA
 frame_size = 360
 
 src = "/imatge/lpanagiotis/work/GTEA_Gaze/predictions"
-dst = "/imatge/lpanagiotis/work/GTEA_Gaze/clstm_predictions"
+#dst = "/imatge/lpanagiotis/work/GTEA_Gaze/clstm_predictions"
+"""
 # Parameters
 params = {'batch_size': 1, # number of videos / batch, I need to implement padding if I want to do more than 1, but with DataParallel it's quite messy
           'num_workers': 4,
@@ -42,7 +44,7 @@ def main():
         frames_path = src,
         clip_length = clip_length,
         transforms = transforms.Compose([
-            transforms.Resize(frame_size),
+            #transforms.Resize(frame_size),
             transforms.ToTensor()
             ])
         )
@@ -82,6 +84,8 @@ def main():
     # ================== Inference =====================
     if not os.path.exists(dst):
         os.mkdir(dst)
+    else:
+        print("Be warned, you are about to write on an existing folder. If this is not intentional cancel now.")
 
     # switch to evaluate mode
     model.eval()

@@ -130,7 +130,6 @@ def main(params = params):
         # train for one epoch
         train_loss = train(train_loader, model, criterion, optimizer, epoch)
 
-        # cuda error occurs here
         val_loss = validate(val_loader, model, criterion, epoch)
         # if validation has not improved for a certain amount of epochs, reduce the learning rate:
         scheduler.step(val_loss)
