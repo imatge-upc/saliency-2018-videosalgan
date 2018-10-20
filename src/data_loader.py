@@ -99,7 +99,7 @@ class DHF1K_frames(data.Dataset):
 
           path_to_gt = os.path.join(self.gt_path, str(true_index), gts[frame])
 
-          y = Image.open(path_to_frame)
+          y = Image.open(path_to_gt)
           if self.transforms:
             y = self.transforms(y)
           y = (y - y.min())/(y.max()-y.min())
