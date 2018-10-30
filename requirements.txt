@@ -93,7 +93,6 @@ PyWavelets==0.5.2
 PyYAML==3.12
 pyzmq==15.2.0
 qtconsole==4.2.1
-requests==2.18.4
 ruamel.ordereddict==0.4.13
 ruamel.yaml==0.15.37
 scandir==1.7
